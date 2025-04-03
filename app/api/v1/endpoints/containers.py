@@ -22,7 +22,7 @@ async def sendContList(containers: List[contrainerInfo] = Body(...)):
 async def sendMetrics(metrics: List[contMetrics] = Body(...)):
     # Проверку на дубликаты
     for container in containers:
-        if not Container.select().where(Container.ID == container.id).exists():
+        if not ContMetrics.select().where(ContMetrics.ID == container.id).exists():
             host = Host.select().where(Host.hostname == container.hostname).first()
             cont = Container.create(
                 ID=container.id,
