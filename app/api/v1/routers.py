@@ -1,7 +1,8 @@
 from fastapi import APIRouter
-from .endpoints import metrics, vms
+from .endpoints import containers, hostInfo, netinfo
 
 router = APIRouter()
 
-router.include_router(router=metrics.router)
-router.include_router(router=vms.router)
+router.include_router(router=containers.router)
+router.include_router(router=hostInfo.router)
+router.include_router(router=netinfo.router)
