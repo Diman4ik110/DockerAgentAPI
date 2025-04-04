@@ -13,7 +13,8 @@ class Host(BaseModel):
     ID = CharField()
     # Основное поле hostname
     hostname = CharField()
-    
+    # Основное поле IP Address
+    IPAddress = CharField()
     class Meta:
         table_name = 'hosts'
     
@@ -66,6 +67,19 @@ class NetworkConn(BaseModel):
     containerID = CharField()
     # Поле с ID сети
     networkID = CharField()
+    class Meta:
+        table_name = 'netConnection'
+    
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
+
+class Agent(BaseModel):
+    # Поле с ID контейнера
+    HostID = IntegerField()
+    # Поле с UUID
+    UUID = TextField()
+    # Поле с ID сети
+    Status = TextField()
     class Meta:
         table_name = 'netConnection'
     

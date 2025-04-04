@@ -9,9 +9,10 @@ router = APIRouter(prefix="/hosts", tags=["DockerMapper"])
 async def sendHostInfo(host: List[hostInfo] = Body(...)):
     # Добавляем в базу хосты с проверкой на наличие
     for h in host:
-        if not Host.select().where(Host.hostname == h.hostname).exists():
+        if not Host.select().where((Host.hostname == h.hostname) & (Host.IPAddress == h.IPAddress)).exists():
             host1 = Host.create(
                 hostname=h.hostname,
+                IPAddress=h.IPAddress
             )
             host1.save()
     db.close()
@@ -22,5 +23,5 @@ async def getHostList():
     query = Host.select()
     result = []
     for host in query:
-        result.append({"hostID": host.ID, "gostname": host.hostname})
+        result.append({"hostID": host.ID, "hostname": host.hostname})
     return result

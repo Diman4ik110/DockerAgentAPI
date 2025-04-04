@@ -21,7 +21,7 @@ async def sendContList(containers: List[contrainerInfo] = Body(...)):
 @router.post("/sendMetrics/")
 async def sendMetrics(metrics: List[contMetrics] = Body(...)):
     # Проверку на дубликаты
-    for container in containers:
+    for container in metrics:
         if not ContMetrics.select().where(ContMetrics.ID == container.id).exists():
             host = Host.select().where(Host.hostname == container.hostname).first()
             cont = Container.create(
