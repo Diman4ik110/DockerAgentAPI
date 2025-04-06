@@ -1,8 +1,7 @@
 from peewee import *
-import datetime
 
 # Определяем базу данных (SQLite в данном примере)
-db = SqliteDatabase('database')
+db = SqliteDatabase('database.db')
 
 class BaseModel(Model):
     class Meta:
@@ -34,6 +33,7 @@ class Network(BaseModel):
     
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)
+    
 class Container(BaseModel):
     # Поле с ID контейнера
     ID = CharField()
@@ -41,7 +41,8 @@ class Container(BaseModel):
     hostID = IntegerField()
     # Поле с именем контейнера
     name = CharField()
-
+    # Поле с названием образа
+    image = CharField()
     class Meta:
         table_name = 'containers'
     
@@ -52,12 +53,15 @@ class ContMetrics(BaseModel):
     # Поле с ID контейнера
     contID = CharField()
     # Поле с загрузкой процессора
-    loadCPU = IntegerField()
+    loadCPU = FloatField()
     # Поле с загрузкой оперативной памяти
-    loadRAM = IntegerField()
+    loadRAM = FloatField()
 
+    status = CharField()
+
+    lastUpdate = CharField()
     class Meta:
-        table_name = 'containerMetrics'
+        table_name = 'containerStats'
     
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)
@@ -69,7 +73,7 @@ class NetworkConn(BaseModel):
     networkID = CharField()
     class Meta:
         table_name = 'netConnection'
-    
+        primary_key = False
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)
 
@@ -81,7 +85,37 @@ class Agent(BaseModel):
     # Поле с ID сети
     Status = TextField()
     class Meta:
-        table_name = 'netConnection'
+        table_name = 'agents'
+        primary_key = False
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
+
+class ContView(BaseModel):
+    # Поле с ID контейнера
+    ContID = CharField()
+    # Поле с UUID
+    status = IntegerField()
+    # Поле с ID сети
+    ContName = CharField()
+
+    HostID = IntegerField()
+
+    hostname = CharField()
+    class Meta:
+        table_name = 'containerView'
+        primary_key = False
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
     
+class ConnView(BaseModel):
+    # Поле с ID контейнера
+    sourceID = CharField()
+    # Поле с ID сети
+    targetID = CharField()
+
+    netID = CharField()
+    class Meta:
+        table_name = 'linksView'
+        primary_key = False
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)

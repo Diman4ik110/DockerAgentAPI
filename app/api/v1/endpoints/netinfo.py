@@ -44,3 +44,14 @@ async def getNetConnection():
     for connection in query:
         result.append({"contID": connection.containerID, "netID": connection.networkID})
     return result
+
+@router.get("/getLinksView/")
+async def getLinksView():
+    query = ConnView.select()
+    result = []
+    for container in query:
+        result.append({"sourceID": container.sourceID,
+                       "targetID": container.targetID,
+                       "netID": container.netID,
+                       })
+    return result

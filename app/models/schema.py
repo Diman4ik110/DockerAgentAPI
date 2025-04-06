@@ -10,12 +10,15 @@ class contrainerInfo(BaseModel):
     name: str
     id: str
     hostname: str
+    image: str
 
 # Класс который будет использоваться для валидации метрик
 class contMetrics(BaseModel):
     contID: str
-    loadCPU: int
-    loadRAM: int
+    lastUpdate: str
+    loadCPU: float
+    loadRAM: float
+    status: str
 
 # Класс который будет использоваться для валидации данных о сетях к которым подключены контейнеры
 class networkList(BaseModel):

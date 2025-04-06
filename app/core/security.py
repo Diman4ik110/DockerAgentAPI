@@ -1,9 +1,6 @@
-from fastapi import FastAPI
-from app.api.v1.routers import router
+import app
 from fastapi.middleware.cors import CORSMiddleware
 
-
-app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Разрешить все домены (для разработки!)
@@ -11,13 +8,3 @@ app.add_middleware(
     allow_methods=["*"],  # Разрешить все методы (GET, POST, и т.д.)
     allow_headers=["*"],  # Разрешить все заголовки
 )
-
-app.include_router(router, prefix="/api/v1")
-
-@app.get("/")
-async def health_check():
-    return {"Сосите": "буй!!"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
