@@ -1,1 +1,3 @@
-fastapi pydantic peewee
+fastapi 
+pydantic 
+peewee

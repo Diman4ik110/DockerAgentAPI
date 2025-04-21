@@ -1,20 +1,25 @@
 from fastapi import APIRouter, Body
-from app.models.schema import networkList, networkConnection
+from app.models.schema import networkList, networkConnection, networkStat, connID
 from app.core.database import *
 from typing import List
 
-router = APIRouter(prefix="/netinfo", tags=["DockerMapper"])
+router = APIRouter(prefix="/netinfo", tags=["Network"])
 
 @router.post("/sendNetList/")
-async def sendNetList(netList: List[networkList] = Body(...)):
+async def sendNetList(network: networkList = Body(...)):
     # Проверку на дубликаты
-    for net in netList:
-        if not Network.select().where(Network.ID == net.netID).exists():
-            network = Network.create(
-                ID=net.netID,
-                name=net.name
-            )
-            network.save()
+    if not Network.select().where(Network.ID == network.netID).exists():
+        net = Network.create(
+            ID=network.netID,
+            name=network.name
+        )
+        net.save()
+    return {"code": "success"}
+
+@router.post("/sendNetData/")
+async def sendNetData():
+    # Проверку на дубликаты
+    
     return {"code": "success"}
 
 @router.post("/sendNetConnection/")
@@ -49,9 +54,64 @@ async def getNetConnection():
 async def getLinksView():
     query = ConnView.select()
     result = []
-    for container in query:
-        result.append({"sourceID": container.sourceID,
-                       "targetID": container.targetID,
-                       "netID": container.netID,
+    for link in query:
+        result.append({"sourceID": link.sourceID,
+                       "targetID": link.targetID,
+                       "netID": link.netID,
+                       "networkName": link.networkName,
+                       "isActive": link.isActive
                        })
     return result
+
+@router.post("/sendNetworkStat/")
+async def sendNetworkStat(netStat: networkStat = Body(...)):
+    if not Container.select().where(Container.ID == netStat.contID).exists():
+        # Проверку на дубликаты
+        netStat = NetworkStat.create(
+            lastUpdate=netStat.lastUpdate,
+            contID=netStat.contID,
+            rxSpeed=netStat.rxSpeed,
+            txSpeed=netStat.txSpeed,
+            rxBytes=netStat.rxBytes,
+            txBytes=netStat.txBytes
+        )
+        netStat.save()
+        return {"code": "success"}
+    else:
+        contain = Container.get(Container.ID == netStat.contID)
+        if(contain.isActive):
+            # Проверку на дубликаты
+            netStat = NetworkStat.create(
+                lastUpdate=netStat.lastUpdate,
+                contID=netStat.contID,
+                rxSpeed=netStat.rxSpeed,
+                txSpeed=netStat.txSpeed,
+                rxBytes=netStat.rxBytes,
+                txBytes=netStat.txBytes
+            )
+            netStat.save()
+            return {"code": "success"}
+
+@router.get("/getNetStatView/")
+async def getNetStatView():
+    query = NetworkStatView.select()
+    result = []
+    # Проверку на дубликаты
+    for netstat in query:
+         result.append({
+                "contID": netstat.contID,
+                "rxSpeed": netstat.rxSpeed,
+                "txSpeed": netstat.txSpeed,
+                "rxBytes": netstat.rxBytes,
+                "txBytes": netstat.txBytes
+            })
+    return result
+@router.delete("/deleteConnection/")
+async def deleteConnection(netID: connID):
+    Network.update({"isActive": False}).where(Network.ID == netID.connID).execute()
+    return {"status": "success"}
+
+@router.put("/restoreConnection")
+async def restoreConnection(netID: connID):
+    Network.update({"isActive": True}).where(Network.ID == netID.connID).execute()
+    return {"status": "success"}
